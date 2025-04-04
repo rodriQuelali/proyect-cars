@@ -1,0 +1,29 @@
+services:
+  django_redis:
+    image: redis:7.2-alpine
+    restart: always
+    container_name: redis
+    ports:
+      - "6379:6379"
+
+  pg_car_store:
+    image: postgres:14
+    container_name: car_store_db
+    healthcheck:
+      # https://www.postgresql.org/docs/14/app-pg-isready.html
+      test: [ "CMD", "pg_isready", "-U", "admin", "-d", "car_store_db"]
+      timeout: 45s
+      interval: 10s
+      retries: 10
+    restart: always
+    environment:
+      - POSTGRES_DB=${DJANGO_DATABASE_NAME}
+      - POSTGRES_USER=${DJANGO_DATABASE_USER}
+      - POSTGRES_PASSWORD=${DJANGO_DATABASE_PASS}
+    ports:
+      - ${DJANGO_DATABASE_PORT}:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+
+volumes:
+  postgres_data:

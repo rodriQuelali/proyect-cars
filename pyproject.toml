@@ -1,0 +1,18 @@
+[tool.bandit]
+exclude_dirs = [
+  '/tests/',
+  'locallib/django/test.py',
+  'venv',
+]
+
+
+[tool.isort]
+profile = "black"
+
+[tool.pytest.ini_options]
+addopts = """\
+  --ds="config.settings.test" \
+  --reuse-db \
+  --strict-config \
+  --pdbcls=IPython.terminal.debugger:TerminalPdb \
+"""

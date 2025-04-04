@@ -1,0 +1,30 @@
+services:
+
+  api:
+    image: app:latest
+    command: [ "pytest", "--create-db" ]
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings.test
+      - DJANGO_DATABASE_HOST=pg_db
+      - DJANGO_DATABASE_NAME=car_store
+      - DJANGO_DATABASE_USER=admin
+      - DJANGO_DATABASE_PASS=123456
+      - DJANGO_DATABASE_PORT=5432
+    depends_on:
+      pg_db:
+        condition: service_healthy
+
+  pg_db:
+    image: postgres:14
+    healthcheck:
+      # https://www.postgresql.org/docs/14/app-pg-isready.html
+      test: [ "CMD", "pg_isready", "-U", "admin", "-d", "car_store"]
+      timeout: 45s
+      interval: 10s
+      retries: 10
+    restart: always
+    environment:
+      - POSTGRES_DB=car_store
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=123456
+      - POSTGRES_PORT=5432
